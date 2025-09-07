@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Science Entrance M.1 – 40 ข้อ (ฟ้า–ส้ม)</title>
+<style>
+:root{
+  --bg:#FFFFFF;
+  --ink:#111111;
+  --card:#FFFFFF;
+  --brand:#2563EB; /* blue */
+  --accent:#F97316; /* orange */
+  --ok:#16A34A;
+  --bad:#DC2626;
+  --muted:#6B7280;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Segoe UI',sans-serif}
+.container{max-width:960px;margin:0 auto;padding:16px}
+.header-top{background:var(--brand);color:#fff;padding:14px;text-align:center;font-size:22px;font-weight:900;letter-spacing:1px}
+.header{display:flex;justify-content:space-between;align-items:center;margin:16px 0}
+.h1{font-size:24px;font-weight:800;color:var(--accent)}
+.progress{font-weight:800;color:var(--brand);font-size:20px}
+.card{background:var(--card);border:2px solid var(--brand);border-radius:14px;padding:22px;box-shadow:0 6px 14px rgba(37,99,235,.07)}
+.question{font-weight:900;font-size:22px;line-height:1.5;margin-bottom:14px;color:#111}
+.choices{display:grid;gap:12px}
+.choice{border:2px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-weight:800;font-size:20px;background:#f8fafc;cursor:pointer;text-align:left}
+.choice:hover{border-color:var(--brand)}
+.choice.selected{border-color:var(--accent);background:#fff7ed}
+.choice.correct{border-color:var(--ok);background:#ecfdf5}
+.choice.wrong{border-color:var(--bad);background:#fef2f2}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btn{padding:12px 20px;border:none;border-radius:999px;font-weight:800;font-size:18px;cursor:pointer}
+.btn.primary{background:var(--brand);color:#fff}
+.btn.secondary{background:#e2e8f0;color:#111}
+.btn.accent{background:var(--accent);color:#fff}
+.jumper{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:8px;margin-top:18px}
+.dot{padding:10px;border-radius:12px;border:2px solid #e5e7eb;background:#fff;font-weight:700;cursor:pointer}
+.dot.current{border-color:var(--accent)}
+.dot.done{background:#fff7ed}
+.dot.correct{background:#ecfdf5;border-color:var(--ok)}
+.dot.wrong{background:#fef2f2;border-color:var(--bad)}
+.result h2{color:var(--brand);font-size:28px;font-weight:900}
+.footer{margin-top:24px;color:var(--muted);font-size:14px;text-align:center}
+.brand{font-weight:900;color:var(--accent)}
+</style>
+</head>
+<body>
+  <div class="header-top">Kru Pai Classroom</div>
+
+  <div class="container">
+    <div class="header">
+      <div class="h1" id="title">Science Entrance M.1 – 40 ข้อ <span class="brand">(ฟ้า–ส้ม)</span></div>
+      <div class="progress" id="progressText">ข้อ 1/40</div>
+    </div>
+
+    <div id="game" class="card">
+      <div class="question" id="question">คำถามจะแสดงที่นี่</div>
+      <div class="choices" id="choices"></div>
+      <div class="controls">
+        <button class="btn secondary" onclick="prevQ()">ย้อนกลับ</button>
+        <button class="btn primary" onclick="nextQ()">ถัดไป</button>
+        <button class="btn accent" onclick="finish()">สรุปคะแนน</button>
+      </div>
+      <div id="jumper" class="jumper"></div>
+    </div>
+
+    <div id="result" class="card" style="display:none">
+      <h2 id="scoreBig">คุณได้ 0/40 คะแนน</h2>
+      <p id="summary">สรุปผล</p>
+      <div class="controls">
+        <button class="btn primary" onclick="location.reload()">เล่นใหม่อีกครั้ง</button>
+      </div>
+    </div>
+
+    <div class="footer">© Kru Pai Classroom • เกมทดสอบ 40 ข้อ • ธีมฟ้า–ส้ม</div>
+  </div>
+
+<script>
+const DATA = [
+  {q:"สารใดต่อไปนี้เป็นสารเนื้อเดียว", options:["น้ำส้มคั้น","น้ำเกลือ","ดินโคลน","ควันบุหรี่"], a:1},
+  {q:"การแยกเกลือจากน้ำทะเลด้วยการระเหยเป็นการเปลี่ยนแปลงชนิดใด", options:["ฟิสิกส์","เคมี","ชีวภาพ","นิวเคลียร์"], a:0},
+  {q:"สารละลายใดนำไฟฟ้าได้ดีที่สุด", options:["น้ำตาล","น้ำมัน","น้ำเกลือ","แอลกอฮอล์"], a:2},
+  {q:"น้ำกลั่นมีค่า pH เท่าไร", options:["3","5","7","9"], a:2},
+  {q:"สารใดเป็นสารประกอบ", options:["เหล็ก","ออกซิเจน","น้ำ","กำมะถัน"], a:2},
+  {q:"การเปลี่ยนน้ำแข็งเป็นไอน้ำโดยตรง เรียกว่า", options:["การควบแน่น","การระเหิด","การหลอมเหลว","การกลั่น"], a:1},
+  {q:"อากาศมีความชื้นสัมพัทธ์ 80% หมายถึง", options:["อากาศอิ่มตัวเต็มที่","มีไอน้ำจริง 80% ของค่าสูงสุด","มีไอน้ำ 80 กรัม/ม³","มีไอน้ำ 80 มล."], a:1},
+  {q:"30°C ความดันไออิ่มตัว=42 มม.ปรอท ถ้าวัดได้ 21 มม.ปรอท RH เท่ากับ", options:["25%","40%","50%","75%"], a:2},
+  {q:"ส่วนใดของพืชสังเคราะห์ด้วยแสง", options:["ราก","ลำต้น","ใบ","ดอก"], a:2},
+  {q:"สิ่งมีชีวิตใดเป็นผู้ผลิต", options:["เห็ด","กบ","สาหร่าย","เหยี่ยว"], a:2},
+  {q:"เอนไซม์อะไมเลสย่อยอะไร", options:["โปรตีน","ไขมัน","คาร์โบไฮเดรต","วิตามิน"], a:2},
+  {q:"หายใจใช้ออกซิเจนได้พลังงานประมาณ", options:["2 ATP","18 ATP","36 ATP","100 ATP"], a:2},
+  {q:"สิ่งมีชีวิตใดปรับตัวในที่แล้ง", options:["กุหลาบ","ผักกาด","กระบองเพชร","สาหร่าย"], a:2},
+  {q:"หน่วยพื้นฐานของสิ่งมีชีวิตคือ", options:["อวัยวะ","เนื้อเยื่อ","เซลล์","โมเลกุล"], a:2},
+  {q:"สารพันธุกรรมคือ", options:["โปรตีน","DNA","RNA","ไขมัน"], a:1},
+  {q:"ผนังเซลล์เห็ดราประกอบด้วย", options:["เซลลูโลส","เพกติน","ไคติน","ไคโตซาน"], a:2},
+  {q:"ผู้บริโภคลำดับที่หนึ่งคือ", options:["กบ","เหยี่ยว","ตั๊กแตน","เสือ"], a:2},
+  {q:"พลังงานในห่วงโซ่อาหารจะ", options:["เพิ่มขึ้น","ลดลง","คงที่","หายไป"], a:1},
+  {q:"สารพิษ DDT สะสมมากสุดใน", options:["สาหร่าย","ปลาเล็ก","ปลาใหญ่","เหยี่ยว"], a:3},
+  {q:"ก๊าซใดทำให้เกิดเรือนกระจก", options:["O2","CO2","N2","H2"], a:1},
+  {q:"ผลเสียจากการตัดไม้ทำลายป่า", options:["อากาศสะอาด","ความชื้นสูง","ดินเสื่อมโทรม","ฝนตกสม่ำเสมอ"], a:2},
+  {q:"พืชตรึงไนโตรเจน", options:["ข้าว","ถั่ว","ข้าวโพด","มัน"], a:1},
+  {q:"แรงทำให้วัตถุตกสู่พื้นโลก", options:["แรงเสียดทาน","แรงลอยตัว","แรงโน้มถ่วง","แรงแม่เหล็ก"], a:2},
+  {q:"ยกวัตถุ 10N สูง 2m งานเท่ากับ", options:["5J","10J","20J","100J"], a:2},
+  {q:"งานจะเกิดขึ้นเมื่อ", options:["มีแรงมากพอ","มีการกระจัด","มีแรงเสียดทาน","มีพลังงาน"], a:1},
+  {q:"สาเหตุหลักของการเกิดลมคือ", options:["โลกหมุนรอบตัวเอง","ความแตกต่างของความกดอากาศ","แรงโน้มถ่วง","การสะท้อนรังสี"], a:1},
+  {q:"วัตถุ 2kg ยกสูง 5m (g=10) Ep เท่ากับ", options:["10J","50J","100J","200J"], a:2},
+  {q:"มวล 1kg ความเร็ว 10m/s Ek เท่ากับ", options:["10J","25J","50J","100J"], a:2},
+  {q:"รถหยุดนิ่งถึง 20m/s ใน 4s a เท่ากับ", options:["2","4","5","10"], a:2},
+  {q:"แรง200N ลาก5m งานเท่ากับ", options:["40J","100J","500J","1000J"], a:3},
+  {q:"โลกหมุนรอบตัวเองใช้เวลา", options:["12ชม.","24ชม.","30วัน","365วัน"], a:1},
+  {q:"กลางวันกลางคืนเกิดจาก", options:["โลกโคจรรอบดวงอาทิตย์","โลกหมุนรอบตัวเอง","ดวงจันทร์หมุนรอบโลก","แกนโลกเอียง"], a:1},
+  {q:"ข้างขึ้นข้างแรมเกิดจาก", options:["โลกโคจร","โลกหมุน","ดวงจันทร์โคจรรอบโลก","ดวงอาทิตย์หมุน"], a:2},
+  {q:"ดาวเคราะห์มีวงแหวนเด่นที่สุด", options:["พฤหัส","เสาร์","ยูเรนัส","เนปจูน"], a:1},
+  {q:"ดาวฤกษ์ใกล้โลกที่สุดคือ", options:["ดาวศุกร์","ดวงอาทิตย์","ดาวพุธ","ดาวเคราะห์น้อย"], a:1},
+  {q:"หน่วยกระแสไฟฟ้า", options:["โวลต์","แอมแปร์","โอห์ม","วัตต์"], a:1},
+  {q:"วงจรไฟถ้าหลอดหนึ่งขาด อีกดวงยังติด", options:["อนุกรม","ขนาน","ผสม","แบตเตอรี่"], a:1},
+  {q:"เสียงใดมีความถี่สูงสุด", options:["20Hz","200Hz","2000Hz","20000Hz"], a:3},
+  {q:"เลนส์รวมแสงคือ", options:["เลนส์เว้า","เลนส์นูน","เลนส์ฉาย","กระจกเว้า"], a:1},
+  {q:"ประจุ +3C ผ่าน 12V งานไฟฟ้าเท่าไร", options:["12J","24J","36J","48J"], a:2}
+];
+
+let idx=0,picked=Array(DATA.length).fill(null),judged=Array(DATA.length).fill(null),orderMaps=Array(DATA.length).fill(null);
+const el={};
+
+function ready(){
+  el.game=document.getElementById('game');
+  el.result=document.getElementById('result');
+  el.question=document.getElementById('question');
+  el.choices=document.getElementById('choices');
+  el.jumper=document.getElementById('jumper');
+  el.progressText=document.getElementById('progressText');
+  el.scoreBig=document.getElementById('scoreBig');
+  el.summary=document.getElementById('summary');
+  render();
+}
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}}
+function render(){
+  const item=DATA[idx];
+  el.progressText.textContent=`ข้อ ${idx+1}/${DATA.length}`;
+  el.question.textContent=item.q;
+  el.choices.innerHTML='';
+  if(!orderMaps[idx]){const base=item.options.map((_,i)=>i);shuffle(base);orderMaps[idx]=base;}
+  const order=orderMaps[idx];const correctScreen=order.indexOf(item.a);
+  for(let i=0;i<order.length;i++){
+    const optIndex=order[i];
+    const b=document.createElement('button');
+    b.className='choice';
+    b.textContent=item.options[optIndex];
+    if(picked[idx]===i)b.classList.add('selected');
+    if(judged[idx]!==null){
+      if(i===correctScreen)b.classList.add('correct');
+      if(picked[idx]===i&&i!==correctScreen)b.classList.add('wrong');
+    }
+    b.onclick=()=>select(i);
+    el.choices.appendChild(b);
+  }
+  el.jumper.innerHTML='';
+  for(let k=0;k<DATA.length;k++){
+    const d=document.createElement('button');
+    d.className='dot';
+    d.textContent=(k+1);
+    if(k===idx)d.classList.add('current');
+    if(judged[k]===true)d.classList.add('correct');
+    else if(judged[k]===false)d.classList.add('wrong');
+    else if(picked[k]!==null)d.classList.add('done');
+    d.onclick=()=>{idx=k;render();};
+    el.jumper.appendChild(d);
+  }
+}
+function prevQ(){if(idx>0){idx--;render();}}
+function nextQ(){if(idx<DATA.length-1){idx++;render();}}
+function select(i){
+  picked[idx]=i;
+  const item=DATA[idx];
+  const order=orderMaps[idx];
+  const correctScreen=order.indexOf(item.a);
+  judged[idx]=(i===correctScreen);
+  render();
+}
+function finish(){
+  let score=0;
+  for(let i=0;i<DATA.length;i++)if(judged[i]===true)score++;
+  const pct=Math.round(score*100/DATA.length);
+  el.scoreBig.textContent=`คุณได้ ${score}/${DATA.length} คะแนน`;
+  el.summary.textContent=`คิดเป็น ${pct}%`;
+  document.getElementById('title').textContent='ผลลัพธ์';
+  el.game.style.display='none';
+  el.result.style.display='block';
+}
+window.addEventListener('DOMContentLoaded',ready);
+</script>
+</body>
+</html>
